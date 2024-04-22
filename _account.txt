@@ -1,0 +1,8 @@
+ACCOUNT;_account
+CLIENT_CODE;_client_code
+F_ACCOUNT;futures_account
+F_CLIENT_CODE;futures_client_code
+IIS_F_ACCOUNT;iis_account
+IIS_F_CLIENT_CODE;iis_client_code
+LOGIN;myLoginID
+PASS;myPassword001
