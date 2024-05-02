@@ -1,15 +1,15 @@
--- Автологин терминала QUIK 
+-- ГЂГўГІГ®Г«Г®ГЈГЁГ­ ГІГҐГ°Г¬ГЁГ­Г Г«Г  QUIK 
 
-local WM_COMMAND = 0x0111; -- константа из windows.h
+local WM_COMMAND = 0x0111; -- ГЄГ®Г­Г±ГІГ Г­ГІГ  ГЁГ§ windows.h
 
 --QUIK_WNDN = "Information and trading system QUIK (version 7.12.1.10)" ;
-timeout = 60000;  -- таймаут между попытками поиска окна логина
+timeout = 60000;  -- ГІГ Г©Г¬Г ГіГІ Г¬ГҐГ¦Г¤Гі ГЇГ®ГЇГ»ГІГЄГ Г¬ГЁ ГЇГ®ГЁГ±ГЄГ  Г®ГЄГ­Г  Г«Г®ГЈГЁГ­Г 
 IS_RUN = true;
 
  T_DP = { -- waiting periods table start-stop 
 	["00:00:01"]="08:05:10", -- 
-	["13:59:55"]="14:01:00", -- morning clearing time - с лагом
-	["18:49:59"]="19:01:00", -- evening clearing time  - с лагом
+	["13:59:55"]="14:01:00", -- morning clearing time - Г± Г«Г ГЈГ®Г¬
+	["18:49:59"]="19:01:00", -- evening clearing time  - Г± Г«Г ГЈГ®Г¬
 	["23:50:00"]="23:59:59", -- 
 };
 NWCalendar={ -- non-working days calendar
@@ -31,7 +31,7 @@ function OnInit()
 	w32 = require("w32")
 
 -- reading of account details	
-	ACC_FILE = "\\".."_account.txt"; -- файл с данными счета
+	ACC_FILE = "\\".."_account.txt"; -- ГґГ Г©Г« Г± Г¤Г Г­Г­Г»Г¬ГЁ Г±Г·ГҐГІГ 
 	ACC_DATA = io.open(getScriptPath()..ACC_FILE,"r");
 	if ACC_DATA == nil then 
 		message(R_NAME.." account details file not found")
@@ -48,9 +48,9 @@ function OnInit()
 		end;
 	end; 
 	ACC_DATA:close();
-	-- логин и пароль для терминала
-	QUIK_LOGIN = tostring(ACC_T["F_ACCOUNT"]);;
-	QUIK_PASSW = tostring(ACC_T["F_ACCOUNT"]);;
+	-- Г«Г®ГЈГЁГ­ ГЁ ГЇГ Г°Г®Г«Гј Г¤Г«Гї ГІГҐГ°Г¬ГЁГ­Г Г«Г 
+	QUIK_LOGIN = tostring(ACC_T["LOGIN"]);
+	QUIK_PASSW = tostring(ACC_T["PASS"]);
 	--ACCOUNT = tostring(ACC_T["F_ACCOUNT"]);
 	--CLIENT_CODE = tostring(ACC_T["F_CLIENT_CODE"]);
 end
@@ -58,35 +58,35 @@ end
 function main()
 	while IS_RUN do
 		if isConnected() == 0 then
-			ServDate=DayMonthChange(os.time(os.date("*t"))); -- получаем дату сервера в формате дд/мм/гггг
-			ServTimeSec = os.time(os.date("*t")); -- конвертируем текущее время сервера из таблицы в секунды
+			ServDate=DayMonthChange(os.time(os.date("*t"))); -- ГЇГ®Г«ГіГ·Г ГҐГ¬ Г¤Г ГІГі Г±ГҐГ°ГўГҐГ°Г  Гў ГґГ®Г°Г¬Г ГІГҐ Г¤Г¤/Г¬Г¬/ГЈГЈГЈГЈ
+			ServTimeSec = os.time(os.date("*t")); -- ГЄГ®Г­ГўГҐГ°ГІГЁГ°ГіГҐГ¬ ГІГҐГЄГіГ№ГҐГҐ ГўГ°ГҐГ¬Гї Г±ГҐГ°ГўГҐГ°Г  ГЁГ§ ГІГ ГЎГ«ГЁГ¶Г» Гў Г±ГҐГЄГіГ­Г¤Г»
 			local waiting = false;
 			isNWday=false;
 			local curDate=DayMonthChange(os.time(os.date("*t")));
 			for k,v in pairs (NWCalendar) do
 				if tostring(k)==curDate then isNWday=v end;
 			end;
-			local weekday=os.date("*t").wday; -- день недели (воскресенье =1)
+			local weekday=os.date("*t").wday; -- Г¤ГҐГ­Гј Г­ГҐГ¤ГҐГ«ГЁ (ГўГ®Г±ГЄГ°ГҐГ±ГҐГ­ГјГҐ =1)
 			if weekday==1 then 
 				waiting = true;
 				--message("Sunday is non-working week day "..weekday);
 				sleep(6*10^5);
-				if not IS_RUN then return; end; -- Если скрипт останавливается, не затягивает процесс
+				if not IS_RUN then return; end; -- Г…Г±Г«ГЁ Г±ГЄГ°ГЁГЇГІ Г®Г±ГІГ Г­Г ГўГ«ГЁГўГ ГҐГІГ±Гї, Г­ГҐ Г§Г ГІГїГЈГЁГўГ ГҐГІ ГЇГ°Г®Г¶ГҐГ±Г±
 			elseif weekday==7 then
 				waiting = true;
 				-- message("Saturday is non-working week day "..weekday);
 				sleep(6*10^5);
-				if not IS_RUN then return; end; -- Если скрипт останавливается, не затягивает процесс
+				if not IS_RUN then return; end; -- Г…Г±Г«ГЁ Г±ГЄГ°ГЁГЇГІ Г®Г±ГІГ Г­Г ГўГ«ГЁГўГ ГҐГІГ±Гї, Г­ГҐ Г§Г ГІГїГЈГЁГўГ ГҐГІ ГЇГ°Г®Г¶ГҐГ±Г±
 			elseif isNWday then
 				waiting = true;
 				--message("Calendar non-working day "..curDate);
 				sleep(6*10^5);
-				if not IS_RUN then return; end; -- Если скрипт останавливается, не затягивает процесс
+				if not IS_RUN then return; end; -- Г…Г±Г«ГЁ Г±ГЄГ°ГЁГЇГІ Г®Г±ГІГ Г­Г ГўГ«ГЁГўГ ГҐГІГ±Гї, Г­ГҐ Г§Г ГІГїГЈГЁГўГ ГҐГІ ГЇГ°Г®Г¶ГҐГ±Г±
 			else
-				for k,v in pairs(T_DP) do -- выключаем работу в период клиринга и периоды открытия/закрытия рынка вне времени стратегии
+				for k,v in pairs(T_DP) do -- ГўГ»ГЄГ«ГѕГ·Г ГҐГ¬ Г°Г ГЎГ®ГІГі Гў ГЇГҐГ°ГЁГ®Г¤ ГЄГ«ГЁГ°ГЁГ­ГЈГ  ГЁ ГЇГҐГ°ГЁГ®Г¤Г» Г®ГІГЄГ°Г»ГІГЁГї/Г§Г ГЄГ°Г»ГІГЁГї Г°Г»Г­ГЄГ  ГўГ­ГҐ ГўГ°ГҐГ¬ГҐГ­ГЁ Г±ГІГ°Г ГІГҐГЈГЁГЁ
 					if k~=nil then
-						StartSec = os.time(TimeConvertion(ServDate,tostring(k))); -- конвертируем время начала паузы в секунды
-						StopSec = os.time(TimeConvertion(ServDate,tostring(v))); -- конвертируем время конца паузы в секунды
+						StartSec = os.time(TimeConvertion(ServDate,tostring(k))); -- ГЄГ®Г­ГўГҐГ°ГІГЁГ°ГіГҐГ¬ ГўГ°ГҐГ¬Гї Г­Г Г·Г Г«Г  ГЇГ ГіГ§Г» Гў Г±ГҐГЄГіГ­Г¤Г»
+						StopSec = os.time(TimeConvertion(ServDate,tostring(v))); -- ГЄГ®Г­ГўГҐГ°ГІГЁГ°ГіГҐГ¬ ГўГ°ГҐГ¬Гї ГЄГ®Г­Г¶Г  ГЇГ ГіГ§Г» Гў Г±ГҐГЄГіГ­Г¤Г»
 						if StopSec>ServTimeSec and  ServTimeSec> StartSec  then 
 							waiting = true;
 						end;
@@ -94,12 +94,12 @@ function main()
 				end;			
 			end;
 			if not waiting then
-				hWnd = w32.FindWindow("InfoClass",""); --QUIK_WNDN); -- поиск главного окна терминала
-				-- нажимаем кнопку
-				w32.PostMessage(hWnd,WM_COMMAND,100,0); -- нажать на кнопку "Установить связь с..."
-				-- w32.PostMessage(hWnd,WM_COMMAND,101,0) -- нажать на кнопку "Разорвать связь с..."
+				hWnd = w32.FindWindow("InfoClass",""); --QUIK_WNDN); -- ГЇГ®ГЁГ±ГЄ ГЈГ«Г ГўГ­Г®ГЈГ® Г®ГЄГ­Г  ГІГҐГ°Г¬ГЁГ­Г Г«Г 
+				-- Г­Г Г¦ГЁГ¬Г ГҐГ¬ ГЄГ­Г®ГЇГЄГі
+				w32.PostMessage(hWnd,WM_COMMAND,100,0); -- Г­Г Г¦Г ГІГј Г­Г  ГЄГ­Г®ГЇГЄГі "Г“Г±ГІГ Г­Г®ГўГЁГІГј Г±ГўГїГ§Гј Г±..."
+				-- w32.PostMessage(hWnd,WM_COMMAND,101,0) -- Г­Г Г¦Г ГІГј Г­Г  ГЄГ­Г®ГЇГЄГі "ГђГ Г§Г®Г°ГўГ ГІГј Г±ГўГїГ§Гј Г±..."
 				sleep(1000);
-				local netConWnd = w32.FindWindow("", "Настройка соединения");
+				local netConWnd = w32.FindWindow("", "ГЌГ Г±ГІГ°Г®Г©ГЄГ  Г±Г®ГҐГ¤ГЁГ­ГҐГ­ГЁГї");
 				--message("netConWnd 1 - "..tostring(netConWnd));
 				if netConWnd == 0 then
 					netConWnd = w32.FindWindow("", "Network connection setting");
@@ -109,12 +109,12 @@ function main()
 					local hChldWnd=0;
 					local nBtnEnter = 0;
 					for 	i=0,5 do
-						hChldWnd = w32.FindWindowEx(netConWnd, hChldWnd, "", ""); -- 1й уровень дочерних окон
+						hChldWnd = w32.FindWindowEx(netConWnd, hChldWnd, "", ""); -- 1Г© ГіГ°Г®ГўГҐГ­Гј Г¤Г®Г·ГҐГ°Г­ГЁГµ Г®ГЄГ®Г­
 						local wndt1 = w32.GetWindowText(hChldWnd,wndt1,256);
 						for 	k=0,1 do
 							wndt = w32.GetWindowText(hChldWnd,wndt,256);
 							--message("hChldWnd - "..tostring(hChldWnd).." wndt1 - "..tostring(wndt1)..": wndt - "..tostring(wndt) ); 
-							if wndt=="&Enter" or wndt=="&Вход" then 
+							if wndt=="&Enter" or wndt=="&Г‚ГµГ®Г¤" then 
 								nBtnEnter=hChldWnd;
 								--message("hChldWnd - "..tostring(hChldWnd).." wndt1 - "..tostring(wndt1)..": wndt - "..tostring(wndt) ); 
 								break;
@@ -156,7 +156,7 @@ function OnStop()
 end;
 
 function FindLoginWindow()
-	hLoginWnd = w32.FindWindow("", "Идентификация пользователя");
+	hLoginWnd = w32.FindWindow("", "Г€Г¤ГҐГ­ГІГЁГґГЁГЄГ Г¶ГЁГї ГЇГ®Г«ГјГ§Г®ГўГ ГІГҐГ«Гї");
 	--message("hLoginWnd 1 - "..tostring(hLoginWnd));
 	if hLoginWnd == 0 then
 		hLoginWnd = w32.FindWindow("", "User identification");
@@ -165,10 +165,10 @@ function FindLoginWindow()
 	return hLoginWnd;
 end
 
-function TimeConvertion(CDate, CTime) -- конвертирует текстовый формат даты и времени в таблицу datetime
-	if CDate == nil or CDate == 0 then -- если при вызове функции дата не указана - то берем текущую
-		--[[ функция os.date("%x") возвращает дату в формате мм/дд/гг, что не соотвествует 
-			 формату getInfoParam('TRADEDATE') дд/мм/гггг, поэтому форматируем вручную
+function TimeConvertion(CDate, CTime) -- ГЄГ®Г­ГўГҐГ°ГІГЁГ°ГіГҐГІ ГІГҐГЄГ±ГІГ®ГўГ»Г© ГґГ®Г°Г¬Г ГІ Г¤Г ГІГ» ГЁ ГўГ°ГҐГ¬ГҐГ­ГЁ Гў ГІГ ГЎГ«ГЁГ¶Гі datetime
+	if CDate == nil or CDate == 0 then -- ГҐГ±Г«ГЁ ГЇГ°ГЁ ГўГ»Г§Г®ГўГҐ ГґГіГ­ГЄГ¶ГЁГЁ Г¤Г ГІГ  Г­ГҐ ГіГЄГ Г§Г Г­Г  - ГІГ® ГЎГҐГ°ГҐГ¬ ГІГҐГЄГіГ№ГіГѕ
+		--[[ ГґГіГ­ГЄГ¶ГЁГї os.date("%x") ГўГ®Г§ГўГ°Г Г№Г ГҐГІ Г¤Г ГІГі Гў ГґГ®Г°Г¬Г ГІГҐ Г¬Г¬/Г¤Г¤/ГЈГЈ, Г·ГІГ® Г­ГҐ Г±Г®Г®ГІГўГҐГ±ГІГўГіГҐГІ 
+			 ГґГ®Г°Г¬Г ГІГі getInfoParam('TRADEDATE') Г¤Г¤/Г¬Г¬/ГЈГЈГЈГЈ, ГЇГ®ГЅГІГ®Г¬Гі ГґГ®Г°Г¬Г ГІГЁГ°ГіГҐГ¬ ГўГ°ГіГ·Г­ГіГѕ
 		]]	 
 		CDate = getInfoParam('TRADEDATE'); 
 		if CDate == 0 then 
@@ -179,22 +179,22 @@ function TimeConvertion(CDate, CTime) -- конвертирует текстовый формат даты и вр
 		end;
 	end;
 	if CTime == nil or CTime == 0 then 
-		CTime = getInfoParam('SERVERTIME'); -- если при вызове функции время не указано - то берем текущее 
+		CTime = getInfoParam('SERVERTIME'); -- ГҐГ±Г«ГЁ ГЇГ°ГЁ ГўГ»Г§Г®ГўГҐ ГґГіГ­ГЄГ¶ГЁГЁ ГўГ°ГҐГ¬Гї Г­ГҐ ГіГЄГ Г§Г Г­Г® - ГІГ® ГЎГҐГ°ГҐГ¬ ГІГҐГЄГіГ№ГҐГҐ 
 		if CTime == 0 then
 			CTime = os.date("%X");
 		end;
 	end;
--- преобразуем дату/время в таблицу вида datetime
+-- ГЇГ°ГҐГ®ГЎГ°Г Г§ГіГҐГ¬ Г¤Г ГІГі/ГўГ°ГҐГ¬Гї Гў ГІГ ГЎГ«ГЁГ¶Гі ГўГЁГ¤Г  datetime
 	local dt = {};
 	dt.day,dt.month,dt.year,dt.hour,dt.min,dt.sec = string.match(CDate..' '..CTime,"(%d*).(%d*).(%d*) (%d*):(%d*):(%d*)");
 	for key,VALUE in pairs(dt) do dt[key] = tonumber(VALUE) end;
-	return dt; -- таблица вида datetime
+	return dt; -- ГІГ ГЎГ«ГЁГ¶Г  ГўГЁГ¤Г  datetime
 end;
 
-function DayMonthChange(t) -- меняет формат даты в текстовом значении из (мм/дд/гг) в (дд/мм/гггг)
+function DayMonthChange(t) -- Г¬ГҐГ­ГїГҐГІ ГґГ®Г°Г¬Г ГІ Г¤Г ГІГ» Гў ГІГҐГЄГ±ГІГ®ГўГ®Г¬ Г§Г­Г Г·ГҐГ­ГЁГЁ ГЁГ§ (Г¬Г¬/Г¤Г¤/ГЈГЈ) Гў (Г¤Г¤/Г¬Г¬/ГЈГЈГЈГЈ)
 	local day = (os.date("%d",t)); 
 	local month = (os.date("%m",t));
 	local year = (os.date("%Y",t));
 	ConvertedDate = day.."/"..month.."/"..year; --year..month..day;
-	return ConvertedDate; -- текстовый формат 
+	return ConvertedDate; -- ГІГҐГЄГ±ГІГ®ГўГ»Г© ГґГ®Г°Г¬Г ГІ 
 end;
